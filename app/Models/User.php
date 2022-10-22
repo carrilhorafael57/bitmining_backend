@@ -21,7 +21,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'wallet_addres',
+        'wallet_address',
         'last_login'
     ];
 
