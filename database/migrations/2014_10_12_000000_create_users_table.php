@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('wallet_address')->unique();
-            $table->date('last_login');
+            $table->timestamp('last_login');
             $table->timestamps();
         });
     }
