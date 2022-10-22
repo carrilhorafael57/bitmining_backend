@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('inventory', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(User::class);
             $table->integer('iron_ore');
             $table->integer('bronze_ore');
             $table->integer('silver_ore');
