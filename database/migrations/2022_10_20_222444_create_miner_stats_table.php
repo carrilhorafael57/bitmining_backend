@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\User;
 
 return new class extends Migration
 {
@@ -14,8 +15,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('miner_stats', function (Blueprint $table) {
-            $table->id('miner_id');
-            $table->foreignId('uid');
+            $table->id();
+            $table->foreignIdFor(User::class);
             $table->integer('boost_level');
             $table->dateTime('mining_start');
             $table->dateTime('mining_end');

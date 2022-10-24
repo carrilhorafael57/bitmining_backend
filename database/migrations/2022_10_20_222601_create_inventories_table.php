@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\User;
 
 return new class extends Migration
 {
@@ -13,10 +14,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_info', function (Blueprint $table) {
-            $table->id('uid');
-            $table->string('wallet_address')->unique();
-            $table->date('last_login');
+        Schema::create('inventories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(User::class);
+            $table->integer('iron_ore');
+            $table->integer('bronze_ore');
+            $table->integer('silver_ore');
+            $table->integer('gold_ore');
+            $table->integer('diamond_ore');
             $table->timestamps();
         });
     }
@@ -28,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_info');
+        Schema::dropIfExists('inventory');
     }
 };
