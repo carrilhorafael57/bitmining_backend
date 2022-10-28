@@ -15,7 +15,7 @@ class MinerStat extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
+        'rarity',
         'boost_level',
         'mining_start',
         'mining_end'

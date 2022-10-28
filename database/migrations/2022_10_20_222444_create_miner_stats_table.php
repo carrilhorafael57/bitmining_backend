@@ -17,6 +17,7 @@ return new class extends Migration
         Schema::create('miner_stats', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class);
+            $table->string('rarity');
             $table->integer('boost_level');
             $table->dateTime('mining_start');
             $table->dateTime('mining_end');

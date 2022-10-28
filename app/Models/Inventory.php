@@ -15,7 +15,6 @@ class Inventory extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
         'iron_ore',
         'bronze_ore',
         'silver_ore',
