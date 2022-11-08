@@ -79,7 +79,7 @@ class UserController extends Controller
                 'last_login' => now()
             ]);
 
-            $inventory = Inventory::create([
+            Inventory::create([
                 'user_id' => $user->id,
                 'iron_ore' => 0,
                 'bronze_ore' => 0,
@@ -87,6 +87,8 @@ class UserController extends Controller
                 'gold_ore' => 0,
                 'diamond_ore' => 0
             ]);
+
+
 
             return new UserResource($user);
         }

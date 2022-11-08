@@ -11,7 +11,7 @@ class MintMinerRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,10 +21,10 @@ class MintMinerRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'id' => [
+            'user_id' => [
                 'required'
             ]
         ];

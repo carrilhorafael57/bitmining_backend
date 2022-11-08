@@ -4,74 +4,55 @@ namespace App\Http\Controllers;
 
 use App\Models\MinerStat;
 use Illuminate\Http\Request;
+use App\Models\Miner;
+use Illuminate\Http\MintMinerRequest;
 
 class MinerStatController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of all miners that the player has.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function allMiners(Request $request)
     {
-        //
+        $miners = MinerStat::all()->where('user_id', $request->user_id);
+
+        return $miners;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Return the player object.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function mintMiner(Request $request){
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\MinerStat  $minerStat
-     * @return \Illuminate\Http\Response
-     */
-    public function show(MinerStat $minerStat)
-    {
-        //
-    }
+        $random = random_int(1,100);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\MinerStat  $minerStat
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, MinerStat $minerStat)
-    {
-        //
-    }
+        if($random >= 0 && $random < 70){
+            $rarity_id = 1;
+        }
+        else if($random >= 70 && $random <= 90){
+            $rarity_id = 2;
+        }
+        else if($random > 90 && $random <= 99){
+            $rarity_id = 3;
+        }
+        else if($random == 100){
+            $rarity_id = 4;
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\MinerStat  $minerStat
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(MinerStat $minerStat)
-    {
-        //
-    }
+        $miner = Miner::findOrFail($rarity_id);
 
-
-    public function mintMiner(MintMinerRequest $mintMinerRequest){
         $minerMinted = MinerStat::create([
-            $mintMinerRequest,
-            random_int(1,4),
-            '0',
-            null,
-            null
+            'user_id' => $request->user_id,
+            'rarity' => $miner->rarity,
+            'boost_level' =>0,
+            'mining_start' => now(),
+            'mining_end' => now()
         ]);
 
-        return $minerMinted->rarity;
+        return $minerMinted;
     }
 }
