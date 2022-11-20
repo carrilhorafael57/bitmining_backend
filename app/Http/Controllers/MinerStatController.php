@@ -34,20 +34,7 @@ class MinerStatController extends Controller
             return;
         }
 
-        $random = random_int(1,100);
-
-        if($random >= 0 && $random < 70){
-            $rarity_id = 1;
-        }
-        else if($random >= 70 && $random <= 90){
-            $rarity_id = 2;
-        }
-        else if($random > 90 && $random <= 99){
-            $rarity_id = 3;
-        }
-        else if($random == 100){
-            $rarity_id = 4;
-        }
+        $rarity_id = $this->generateRarityId();
 
         $miner = Miner::findOrFail($rarity_id);
 
@@ -84,6 +71,23 @@ class MinerStatController extends Controller
         $miner->save();
 
         return $miner;
+    }
+
+    private function generateRarityId(): int
+    {
+        $random = random_int(1,100);
+
+        if($random >= 0 && $random < 70){
+            return $rarity_id = 1;
+        }
+        else if($random >= 70 && $random <= 90){
+            return  $rarity_id = 2;
+        }
+        else if($random > 90 && $random <= 99){
+            return  $rarity_id = 3;
+        }
+
+        return $rarity_id = 4;
     }
 }
 
