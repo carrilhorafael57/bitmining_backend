@@ -29,13 +29,7 @@ class MinerStatController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function mintMiner(MintMinerRequest $request){
-
-        if($request->ore_amount < 100){
-            return;
-        }
-
         $rarity_id = $this->generateRarityId();
-
         $miner = Miner::findOrFail($rarity_id);
 
         $minerMinted = MinerStat::create([
@@ -50,30 +44,26 @@ class MinerStatController extends Controller
     *   select a miner to start
     *
     */
+    // TODO: Form Request
     public function startMining(Request $request){
 
         return $this->mineStarted($request->miner_id);
     }
 
+    // TODO: Form Request
     public function receiveOre(Request $request){
-
         $miner = MinerStat::findOrFail($request->miner_id);
 
-        $mining_finished =$this->checkMiningStatus($miner);
-        
-        if($mining_finished){
+        if($this->checkMiningStatus($miner)){
             $ore_received = $this->oreGenerator($miner->rarity);
-
             $updated_inventory = Inventory::where('user_id', $miner->user_id)->increment($ore_received, 1);
+
             return $updated_inventory;
         }
 
-
         //need to check this, because if the time wanst finished should return something?
         return false;
-
     }
-
 
     private function mineStarted($minerId): MinerStat
     {
@@ -109,86 +99,36 @@ class MinerStatController extends Controller
 
     private function checkMiningStatus($miner): bool
     {
-        if(now()->gte($miner->mining_end)){
-            return true;
-        }
 
-        return false;
+        return now()->gte($miner->mining_end);
     }
 
-    private function oreGenerator($miner_rarity){
+    private function oreGenerator($miner_rarity): string
+    {
+        $minerRarityValues = config('miner.rarity.'.$miner_rarity);
 
+        return $this->getOreTyoe($minerRarityValues);
+    }
+
+    private function getOreType($minerRarityValues): string
+    {
         $random = random_int(1,1000);
+        $oreValues = $minerOreValues['ore'];
+        $ore_to_receive = 'diamond_ore';
 
-        if($miner_rarity == 'common'){
-            if($random >= 1 && $random <= 700){
-                $ore_to_receive = 'bronze_ore';
-            }
-            else if($random > 700 && $random <= 850){
-                $ore_to_receive = 'iron_ore';
-            }
-            else if($random > 850 && $random <= 950){
-                $ore_to_receive = 'silver_ore';
-            }
-            else if($random > 950 && $random <= 995){
-                $ore_to_receive = 'gold_ore';
-            }
-            else{
-                $ore_to_receive = 'diamond_ore';               
-            }
+        if($random >= $oreValues['bronze_ore']['min'] && $random <= $oreValues['bronze_ore']['max']){
+            $ore_to_receive = 'bronze_ore';
         }
-        else if($miner_rarity == 'rare'){
-            if($random >= 1 && $random <= 650){
-                $ore_to_receive = 'bronze_ore';
-            }
-            else if($random > 650 && $random <= 850){
-                $ore_to_receive = 'iron_ore';
-            }
-            else if($random > 850 && $random <= 950){
-                $ore_to_receive = 'silver_ore';
-            }
-            else if($random > 950 && $random <= 995){
-                $ore_to_receive = 'gold_ore';
-            }
-            else{
-                $ore_to_receive = 'diamond_ore';               
-            }
+        else if($random > $oreValues['iron_ore']['min'] && $random <= $oreValues['iron_ore']['max']){
+            $ore_to_receive = 'iron_ore';
         }
-        else if($miner_rarity == 'ultra rare'){
-            if($random >= 1 && $random <= 550){
-                $ore_to_receive = 'bronze_ore';
-            }
-            else if($random > 550 && $random <= 750){
-                $ore_to_receive = 'iron_ore';
-            }
-            else if($random > 750 && $random <= 900){
-                $ore_to_receive = 'silver_ore';
-            }
-            else if($random > 900 && $random <= 995){
-                $ore_to_receive = 'gold_ore';
-            }
-            else{
-                $ore_to_receive = 'diamond_ore';               
-            }
+        else if($random > $oreValues['silver_ore']['min'] && $random <= $oreValues['silver_ore']['max']){
+            $ore_to_receive = 'silver_ore';
         }
-        else if($miner_rarity == 'legendary'){
-            if($random >= 1 && $random <= 450){
-                $ore_to_receive = 'bronze_ore';
-            }
-            else if($random > 450 && $random <= 600){
-                $ore_to_receive = 'iron_ore';
-            }
-            else if($random > 600 && $random <= 800){
-                $ore_to_receive = 'silver_ore';
-            }
-            else if($random > 800 && $random <= 950){
-                $ore_to_receive = 'gold_ore';
-            }
-            else{
-                $ore_to_receive = 'diamond_ore';               
-            }
+        else if($random > $oreValues['gold_ore']['min'] && $random <= $oreValues['gold_ore']['max']){
+            $ore_to_receive = 'gold_ore';
         }
-        
+
         return $ore_to_receive;
     }
 }
