@@ -24,3 +24,4 @@ Route::post('/check-user', [UserController::class, 'checkUser']);
 Route::post('/miner-inventory', [MinerStatController::class, 'allMiners']);
 Route::post('/new-miner', [MinerStatController::class, 'mintMiner']);
 Route::post('/miner-start', [MinerStatController::class, 'startMining']);
+Route::post('/miner-finished', [MinerStatController::class, 'receiveOre']);

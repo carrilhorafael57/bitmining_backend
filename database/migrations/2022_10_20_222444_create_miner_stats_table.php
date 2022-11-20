@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class);
             $table->string('rarity');
-            $table->integer('boost_level');
+            $table->integer('boost_level')->default(0);
             $table->dateTime('mining_start')->nullable();
             $table->dateTime('mining_end')->nullable();
             $table->timestamps();

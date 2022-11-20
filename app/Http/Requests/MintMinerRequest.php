@@ -25,6 +25,9 @@ class MintMinerRequest extends FormRequest
     {
         return [
             'user_id' => [
+                'required',
+            ],
+            'ore_amount' => [
                 'required'
             ]
         ];
