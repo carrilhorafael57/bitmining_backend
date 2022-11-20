@@ -25,7 +25,7 @@ class MinerStatController extends Controller
     /**
      * Return the player miners inventory
      * Check if the ore amount is minimum of 100
-     * 
+     *
      * @return \Illuminate\Http\Response
      */
     public function mintMiner(Request $request){
@@ -62,88 +62,31 @@ class MinerStatController extends Controller
         return $minerMinted;
     }
     /*
-    *   Set the start mining and end mining times for a specific miner when the user 
+    *   Set the start mining and end mining times for a specific miner when the user
     *   select a miner to start
-    *  
+    *
     */
     public function startMining(Request $request){
 
-        $miner = MinerStat::findOrFail($request->miner_id);
+        return $this->mineStarted($request->miner_id);
+    }
 
-       // checkRarity($miner->rarity);
-
-        switch($miner->rarity){
-            case 'common':
-                $boost_speed = 15;
-                $mining_time = 1440;
-                break;
-            case 'rare':
-                $boost_speed = 30;
-                $mining_time = 1320;
-                break;
-            case 'ultra rare':
-                $boost_speed = 45;
-                $mining_time = 1200;
-                break;
-            case 'legendary':
-                $boost_speed = 60;
-                $mining_time = 1080;
-                break;
-        }
-
-        switch($miner->boost_level){
-            case 0:
-                $miner->mining_start = now();
-                $miner->mining_end = now()->addMinutes($mining_time - $boost_speed);
-                break;
-            case 1:
-                $miner->mining_start = now();
-                $miner->mining_end = now()->addMinutes($mining_time - ($boost_speed * 2));
-                break;
-            case 3:
-                $miner->mining_start = now();
-                $miner->mining_end = now()->addMinutes($mining_time - ($boost_speed * 3));
-                break;
-            case 4:
-                $miner->mining_start = now();
-                $miner->mining_end = now()->addMinutes($mining_time - ($boost_speed * 4));
-                break;
-        }
-
+    private function mineStarted($minerId): MinerStat
+    {
+        $miner = MinerStat::findOrFail($minerId);
+        $rarityValues = config('miner.rarity.'.$miner->rarity);
+        $boost_speed = $rarityValues['boost_speed'];
+        $mining_time = $rarityValues['mining_time'];
+        $miner->mining_start = now();
+        $defaultMultiplicator = 1;
+        $boostSpeedLevel = $miner->boost_level + $defaultMultiplicator;
+        $miner->mining_end = now()->addMinutes($mining_time - ($boost_speed * $boostSpeedLevel));
         $miner->save();
 
         return $miner;
     }
-
-    
-
 }
 
-    /*
-    *   Function that returns status based on miner rarity
-    *
-    */
-    function checkRarity($rarity){
-        switch($rarity){
-            case 'common':
-                $boost_speed = 15;
-                $mining_time = 1440;
-                break;
-            case 'rare':
-                $boost_speed = 30;
-                $mining_time = 1320;
-                break;
-            case 'ultra rare':
-                $boost_speed = 45;
-                $mining_time = 1200;
-                break;
-            case 'legendary':
-                $boost_speed = 60;
-                $mining_time = 1080;
-                break;
-
-                //need to add return
-    }
 
 
-}
+
