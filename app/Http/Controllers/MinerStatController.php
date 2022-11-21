@@ -56,14 +56,33 @@ class MinerStatController extends Controller
 
         if($this->checkMiningStatus($miner)){
             $ore_received = $this->oreGenerator($miner->rarity);
-            $updated_inventory = Inventory::where('user_id', $miner->user_id)->increment($ore_received, 1);
+            Inventory::where('user_id', $miner->user_id)->increment($ore_received, 1);
+            $this->resetMiningTimes($miner);
+
+            $updated_inventory = Inventory::find($miner->user_id);
 
             return $updated_inventory;
         }
 
         //need to check this, because if the time wanst finished should return something?
-        return false;
+        return 'Not yet';
     }
+
+    // TODO: Form Request
+    public function boost(Request $request){
+        
+        $miner = MinerStat::find($request->miner_id);
+        //Need to check if current balance of minecoin in the wallet
+        // $mineCoin_amount = balanceOf();
+        if($miner->boost_level < 4){
+            $miner->boost_level += 1;
+        }
+
+        $miner->save();
+
+        return $miner;
+    }
+
 
     private function mineStarted($minerId): MinerStat
     {
@@ -107,13 +126,13 @@ class MinerStatController extends Controller
     {
         $minerRarityValues = config('miner.rarity.'.$miner_rarity);
 
-        return $this->getOreTyoe($minerRarityValues);
+        return $this->getOreType($minerRarityValues);
     }
 
     private function getOreType($minerRarityValues): string
     {
         $random = random_int(1,1000);
-        $oreValues = $minerOreValues['ore'];
+        $oreValues = $minerRarityValues['ore'];
         $ore_to_receive = 'diamond_ore';
 
         if($random >= $oreValues['bronze_ore']['min'] && $random <= $oreValues['bronze_ore']['max']){
@@ -131,6 +150,15 @@ class MinerStatController extends Controller
 
         return $ore_to_receive;
     }
+
+    private function resetMiningTimes($miner){
+        $miner->mining_start = null;
+        $miner->mining_end = null;
+        $miner->save();
+    }
+
+
+
 }
 
 
