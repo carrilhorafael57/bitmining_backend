@@ -16,7 +16,7 @@ class UserResource extends JsonResource
     {
         return [
             'inventory' => $this->inventory,
-            'minerStats' => $this->minerStats
+            'minerStats' => $this->minerStats,
         ];
     }
 }

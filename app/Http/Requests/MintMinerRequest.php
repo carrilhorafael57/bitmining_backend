@@ -6,26 +6,21 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class MintMinerRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, mixed>
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'id' => [
-                'required'
+            'user_id' => [
+                'required',
+                'exists:user'
+            ],
+            'ore_amount' => [
+                'required',
+                'max:100'
             ]
         ];
     }

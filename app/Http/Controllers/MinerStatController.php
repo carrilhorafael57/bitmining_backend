@@ -4,74 +4,163 @@ namespace App\Http\Controllers;
 
 use App\Models\MinerStat;
 use Illuminate\Http\Request;
+use App\Models\Miner;
+use App\Http\Requests\MintMinerRequest;
+use App\Models\Inventory;
 
 class MinerStatController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of all miners that the player has.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function allMiners(Request $request)
     {
-        //
+        $miners = MinerStat::all()->where('user_id', $request->user_id);
+
+        return $miners;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Return the player miners inventory
+     * Check if the ore amount is minimum of 100
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function mintMiner(MintMinerRequest $request){
+        $rarity_id = $this->generateRarityId();
+        $miner = Miner::findOrFail($rarity_id);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\MinerStat  $minerStat
-     * @return \Illuminate\Http\Response
-     */
-    public function show(MinerStat $minerStat)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\MinerStat  $minerStat
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, MinerStat $minerStat)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\MinerStat  $minerStat
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(MinerStat $minerStat)
-    {
-        //
-    }
-
-
-    public function mintMiner(MintMinerRequest $mintMinerRequest){
         $minerMinted = MinerStat::create([
-            $mintMinerRequest,
-            random_int(1,4),
-            '0',
-            null,
-            null
+            'user_id' => $request->user_id,
+            'rarity' => $miner->rarity,
         ]);
 
-        return $minerMinted->rarity;
+        return $minerMinted;
     }
+    /*
+    *   Set the start mining and end mining times for a specific miner when the user
+    *   select a miner to start
+    *
+    */
+    // TODO: Form Request
+    public function startMining(Request $request){
+
+        return $this->mineStarted($request->miner_id);
+    }
+
+    // TODO: Form Request
+    public function receiveOre(Request $request){
+        $miner = MinerStat::findOrFail($request->miner_id);
+
+        if($this->checkMiningStatus($miner)){
+            $ore_received = $this->oreGenerator($miner->rarity);
+            Inventory::where('user_id', $miner->user_id)->increment($ore_received, 1);
+            $this->resetMiningTimes($miner);
+
+            $updated_inventory = Inventory::find($miner->user_id);
+
+            return $updated_inventory;
+        }
+
+        //need to check this, because if the time wanst finished should return something?
+        return 'Not yet';
+    }
+
+    // TODO: Form Request
+    public function boost(Request $request){
+        
+        $miner = MinerStat::find($request->miner_id);
+        //Need to check if current balance of minecoin in the wallet
+        // $mineCoin_amount = balanceOf();
+        if($miner->boost_level < 4){
+            $miner->boost_level += 1;
+        }
+
+        $miner->save();
+
+        return $miner;
+    }
+
+
+    private function mineStarted($minerId): MinerStat
+    {
+        $miner = MinerStat::findOrFail($minerId);
+        $rarityValues = config('miner.rarity.'.$miner->rarity);
+        $boost_speed = $rarityValues['boost_speed'];
+        $mining_time = $rarityValues['mining_time'];
+        $miner->mining_start = now();
+        $defaultMultiplicator = 1;
+        $boostSpeedLevel = $miner->boost_level + $defaultMultiplicator;
+        $miner->mining_end = now()->addMinutes($mining_time - ($boost_speed * $boostSpeedLevel));
+        $miner->save();
+
+        return $miner;
+    }
+
+    private function generateRarityId(): int
+    {
+        $random = random_int(1,100);
+
+        if($random >= 0 && $random < 70){
+            return $rarity_id = 1;
+        }
+        else if($random >= 70 && $random <= 90){
+            return  $rarity_id = 2;
+        }
+        else if($random > 90 && $random <= 99){
+            return  $rarity_id = 3;
+        }
+
+        return $rarity_id = 4;
+    }
+
+    private function checkMiningStatus($miner): bool
+    {
+
+        return now()->gte($miner->mining_end);
+    }
+
+    private function oreGenerator($miner_rarity): string
+    {
+        $minerRarityValues = config('miner.rarity.'.$miner_rarity);
+
+        return $this->getOreType($minerRarityValues);
+    }
+
+    private function getOreType($minerRarityValues): string
+    {
+        $random = random_int(1,1000);
+        $oreValues = $minerRarityValues['ore'];
+        $ore_to_receive = 'diamond_ore';
+
+        if($random >= $oreValues['bronze_ore']['min'] && $random <= $oreValues['bronze_ore']['max']){
+            $ore_to_receive = 'bronze_ore';
+        }
+        else if($random > $oreValues['iron_ore']['min'] && $random <= $oreValues['iron_ore']['max']){
+            $ore_to_receive = 'iron_ore';
+        }
+        else if($random > $oreValues['silver_ore']['min'] && $random <= $oreValues['silver_ore']['max']){
+            $ore_to_receive = 'silver_ore';
+        }
+        else if($random > $oreValues['gold_ore']['min'] && $random <= $oreValues['gold_ore']['max']){
+            $ore_to_receive = 'gold_ore';
+        }
+
+        return $ore_to_receive;
+    }
+
+    private function resetMiningTimes($miner){
+        $miner->mining_start = null;
+        $miner->mining_end = null;
+        $miner->save();
+    }
+
+
+
 }
+
+
+
+
