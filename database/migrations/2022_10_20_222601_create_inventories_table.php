@@ -17,11 +17,11 @@ return new class extends Migration
         Schema::create('inventories', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class);
-            $table->integer('iron_ore');
-            $table->integer('bronze_ore');
-            $table->integer('silver_ore');
-            $table->integer('gold_ore');
-            $table->integer('diamond_ore');
+            $table->double('iron_ore');
+            $table->double('bronze_ore');
+            $table->double('silver_ore');
+            $table->double('gold_ore');
+            $table->double('diamond_ore');
             $table->timestamps();
         });
     }

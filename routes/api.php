@@ -26,3 +26,4 @@ Route::post('/new-miner', [MinerStatController::class, 'mintMiner']);
 Route::post('/miner-start', [MinerStatController::class, 'startMining']);
 Route::post('/miner-finished', [MinerStatController::class, 'receiveOre']);
 Route::post('/miner-boost', [MinerStatController::class, 'boost']);
+Route::post('/mining-timecheck', [MinerStatController::class, 'checkMiningTimeLeft']);

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Miner;
 use App\Http\Requests\MintMinerRequest;
 use App\Models\Inventory;
+use DateTime;
 
 class MinerStatController extends Controller
 {
@@ -63,11 +64,11 @@ class MinerStatController extends Controller
 
             return $updated_inventory;
         }
-
+        
         //need to check this, because if the time wanst finished should return something?
         return 'Not yet';
     }
-
+    
     // TODO: Form Request
     public function boost(Request $request){
         
@@ -77,13 +78,20 @@ class MinerStatController extends Controller
         if($miner->boost_level < 4){
             $miner->boost_level += 1;
         }
-
+        
         $miner->save();
-
+        
         return $miner;
     }
-
-
+    
+    // TODO: Form Request
+    public function checkMiningTimeLeft(Request $request)
+    {
+        $miner = MinerStat::findOrFail($request->miner_id);
+        $timeCounter = now()->diffAsCarbonInterval($miner->mining_end);
+        return $timeCounter;
+    }
+    
     private function mineStarted($minerId): MinerStat
     {
         $miner = MinerStat::findOrFail($minerId);
@@ -116,11 +124,12 @@ class MinerStatController extends Controller
         return $rarity_id = 4;
     }
 
-    private function checkMiningStatus($miner): bool
+    private function checkMiningStatus($minerId): bool
     {
-
+        $miner = MinerStat::findOrFail($minerId);
         return now()->gte($miner->mining_end);
     }
+
 
     private function oreGenerator($miner_rarity): string
     {
@@ -155,6 +164,13 @@ class MinerStatController extends Controller
         $miner->mining_start = null;
         $miner->mining_end = null;
         $miner->save();
+    }
+
+    private function convertingAllOres($userId){
+        $inventory = Inventory::find($userId);
+
+        
+        
     }
 
 

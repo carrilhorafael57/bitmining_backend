@@ -16,11 +16,7 @@ class MintMinerRequest extends FormRequest
         return [
             'user_id' => [
                 'required',
-                'exists:user'
-            ],
-            'ore_amount' => [
-                'required',
-                'max:100'
+                'exists:users,id'
             ]
         ];
     }
