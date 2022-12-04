@@ -64,8 +64,10 @@ class MinerStatController extends Controller
 
             return $updated_inventory;
         }
+        else if(($miner->mining_start || $miner->mining_end) == null){
+            return 'Miner is not mining';
+        }
         
-        //need to check this, because if the time wanst finished should return something?
         return 'Not yet';
     }
     
@@ -124,9 +126,8 @@ class MinerStatController extends Controller
         return $rarity_id = 4;
     }
 
-    private function checkMiningStatus($minerId): bool
+    private function checkMiningStatus($miner): bool
     {
-        $miner = MinerStat::findOrFail($minerId);
         return now()->gte($miner->mining_end);
     }
 
