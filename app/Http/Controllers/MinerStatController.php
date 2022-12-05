@@ -6,6 +6,7 @@ use App\Models\MinerStat;
 use Illuminate\Http\Request;
 use App\Models\Miner;
 use App\Http\Requests\MintMinerRequest;
+use App\Http\Requests\MinerIdRequest;
 use App\Models\Inventory;
 use DateTime;
 
@@ -16,11 +17,13 @@ class MinerStatController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function allMiners(Request $request)
+    public function allMiners(MintMinerRequest $request)
     {
-        $miners = MinerStat::all()->where('user_id', $request->user_id);
+            $miners = MinerStat::all()->where('user_id', $request->user_id);
+            if($miners){
+                return $miners;
+            }
 
-        return $miners;
     }
 
     /**
@@ -51,8 +54,7 @@ class MinerStatController extends Controller
         return $this->mineStarted($request->miner_id);
     }
 
-    // TODO: Form Request
-    public function receiveOre(Request $request){
+    public function receiveOre(MinerIdRequest $request){
         $miner = MinerStat::findOrFail($request->miner_id);
 
         if($this->checkMiningStatus($miner)){
@@ -71,10 +73,10 @@ class MinerStatController extends Controller
         return 'Not yet';
     }
     
-    // TODO: Form Request
-    public function boost(Request $request){
+
+    public function boost(MinerIdRequest $request){
         
-        $miner = MinerStat::find($request->miner_id);
+        $miner = MinerStat::findOrFail($request->miner_id);
         //Need to check if current balance of minecoin in the wallet
         // $mineCoin_amount = balanceOf();
         if($miner->boost_level < 4){
@@ -86,12 +88,29 @@ class MinerStatController extends Controller
         return $miner;
     }
     
-    // TODO: Form Request
-    public function checkMiningTimeLeft(Request $request)
+
+    public function checkMiningTimeLeft(MinerIdRequest $request)
     {
         $miner = MinerStat::findOrFail($request->miner_id);
-        $timeCounter = now()->diffAsCarbonInterval($miner->mining_end);
-        return $timeCounter;
+
+        if($miner){
+            if(now()->lte($miner->mining_end)){
+                $timeCounter = now()->diffAsCarbonInterval($miner->mining_end);
+            }
+            else{
+                $timeCounter = 0;
+            }
+            return $timeCounter;
+        }
+        else{
+            return "Miner not found";
+        }
+    }
+
+    public function cancelMining(Request $request){
+        $this->resetMiningTimes($request->miner);
+
+        return "Mining cancelled";
     }
     
     private function mineStarted($minerId): MinerStat
@@ -167,12 +186,6 @@ class MinerStatController extends Controller
         $miner->save();
     }
 
-    private function convertingAllOres($userId){
-        $inventory = Inventory::find($userId);
-
-        
-        
-    }
 
 
 

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Inventory;
 use App\Http\Requests\CheckUserRequest;
+use App\Models\MinerStat;
 
 class UserController extends Controller
 {
@@ -88,9 +89,27 @@ class UserController extends Controller
                 'diamond_ore' => 0
             ]);
 
+            MinerStat::create([
+                'user_id' => $user->id,
+                'rarity' => 'common',
+            ]);
+
+            MinerStat::create([
+                'user_id' => $user->id,
+                'rarity' => 'common',
+            ]);
+
 
 
             return new UserResource($user);
         }
+    }
+
+    private function convertingAllOres($userId){
+        $inventory = Inventory::find($userId);
+
+        
+        
+        
     }
 }

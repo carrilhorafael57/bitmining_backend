@@ -18,5 +18,5 @@ Route::get('/', function () {
 });
 
 Route::get('/play', function () {
-    return view('welcome');
+    return view('gamescreen');
 });
