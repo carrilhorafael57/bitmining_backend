@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        return view('play');
     }
 
     /**
@@ -71,7 +71,7 @@ class UserController extends Controller
         if($user = User::where('wallet_address', $request->wallet_address)->get()->first())
         {
     
-            return new UserResource($user);
+            return $user->id;
         }
         else
         {
@@ -99,17 +99,16 @@ class UserController extends Controller
                 'rarity' => 'common',
             ]);
 
-
-
-            return new UserResource($user);
+            return $user->id;
         }
     }
 
-    private function convertingAllOres($userId){
-        $inventory = Inventory::find($userId);
 
+    public function loadInventory(Request $request){
+        $user = User::findOrFail($request->user_id);
         
-        
-        
+        return $user->inventory;
     }
+
+  
 }

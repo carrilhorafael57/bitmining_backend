@@ -17,8 +17,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 //User Routes
-Route::apiResource('users', UserController::class);
 Route::post('/check-user', [UserController::class, 'checkUser']);
+Route::post('/load-inventory',[UserController::class, 'loadInventory']);
 
 //Miner routes
 Route::post('/miner-inventory', [MinerStatController::class, 'allMiners']);

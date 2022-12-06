@@ -16,7 +16,11 @@
           </div>
 
           <div>
-            <button type="button" class="inline-block px-6 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase rounded-full shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">Play</button>
+            <a href='/play'>
+              <button  type="button" class="inline-block px-6 py-2.5 bg-red-600 text-white font-medium text-xs leading-tight uppercase rounded-full shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out">
+                Play
+              </button>
+            </a>
           </div>
         </div>
       </nav>
@@ -56,7 +60,7 @@
     
     <footer class="absolute bottom-0 left-0 w-full p-4 bg-white rounded-lg shadow md:px-6 md:py-8 dark:bg-gray-900">
       <div class="sm:flex sm:items-center sm:justify-between">
-          <a href="https://flowbite.com/" class="flex items-center mb-4 sm:mb-0">
+          <a href="#" class="flex items-center mb-4 sm:mb-0">
               <img src="https://www.svgrepo.com/show/275512/pickaxe.svg" class="mr-3 h-8" alt="Pickaxe Logo" />
               <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">BitMining</span>
           </a>

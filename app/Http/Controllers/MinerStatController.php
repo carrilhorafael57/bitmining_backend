@@ -75,17 +75,20 @@ class MinerStatController extends Controller
     
 
     public function boost(MinerIdRequest $request){
-        
-        $miner = MinerStat::findOrFail($request->miner_id);
-        //Need to check if current balance of minecoin in the wallet
-        // $mineCoin_amount = balanceOf();
-        if($miner->boost_level < 4){
-            $miner->boost_level += 1;
+
+        if($request->hasCoin == true){
+            $miner = MinerStat::findOrFail($request->miner_id);
+            //Need to check if current balance of minecoin in the wallet
+            // $mineCoin_amount = balanceOf();
+            if($miner->boost_level < 4){
+                $miner->boost_level += 1;
+            }
+            
+            $miner->save();
+            
+            return $miner;
         }
-        
-        $miner->save();
-        
-        return $miner;
+        return "Boost failed";
     }
     
 
@@ -187,8 +190,13 @@ class MinerStatController extends Controller
     }
 
 
+    private function convertingAllOres($userId): Inventory
+    {
+        $inventory = Inventory::findOrFail($userId);
+        
 
-
+        return $inventory;
+    }
 }
 
 
