@@ -33,15 +33,22 @@ class MinerStatController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function mintMiner(MintMinerRequest $request){
-        $rarity_id = $this->generateRarityId();
-        $miner = Miner::findOrFail($rarity_id);
 
-        $minerMinted = MinerStat::create([
-            'user_id' => $request->user_id,
-            'rarity' => $miner->rarity,
-        ]);
+        $hasOres = $this->hasOres($request->user_id);
 
-        return $minerMinted;
+        if($hasOres){
+            $rarity_id = $this->generateRarityId();
+            $miner = Miner::findOrFail($rarity_id);
+
+            $minerMinted = MinerStat::create([
+                'user_id' => $request->user_id,
+                'rarity' => $miner->rarity,
+            ]);
+
+            return $minerMinted;
+        }
+
+        return "Do not have enough coins";
     }
     /*
     *   Set the start mining and end mining times for a specific miner when the user
@@ -190,12 +197,38 @@ class MinerStatController extends Controller
     }
 
 
-    private function convertingAllOres($userId): Inventory
+    private function hasOres($userId): bool
     {
+    
         $inventory = Inventory::findOrFail($userId);
         
+        if($inventory->bronze_ore >= 100){
+            $inventory->bronze_ore = $inventory->bronze_ore - 100;
+            $inventory->save();
+            return true;
+        }
+        else if($inventory->iron_ore >= 75){
+            $inventory->iron_ore = $inventory->iron_ore - 75;
+            $inventory->save();
+            return true;
+        }
+        else if($inventory->silver_ore >= 50){
+            $inventory->silver_ore = $inventory->silver_ore - 50;
+            $inventory->save();
+            return true;
+        }
+        else if($inventory->gold_ore >= 15){
+            $inventory->gold_ore = $inventory->gold_ore - 15;
+            $inventory->save();
+            return true;
+        }
+        else if($inventory->diamond_ore >= 5){
+            $inventory->diamond_ore = $inventory->diamond_ore - 5;
+            $inventory->save();
+            return true;
+        }
 
-        return $inventory;
+        return false;
     }
 }
 
